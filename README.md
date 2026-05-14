@@ -1,1 +1,3 @@
-# Text-Editor-With-Garbage-Collection
+# ManiText
+
+- A text editor with garbage-collection
