@@ -1,22 +1,21 @@
-//düzenleme yapılacaktır
-//****************************************************
+// 20 Mayıs 2026
+//********************
+
 
 void print() {
-    int current = head; // Okumaya listenin başından (head) başlıyoruz
-    int screen_line = 0; // NCURSES ekranında hangi satıra yazacağımızı tutar
+    int current = head; 
+    int screen_line = 0; 
 
-    // Liste boşsa veya head geçersizse ekrana uyarı verip çıkabiliriz
     if (current == -1) {
-        mvprintw(0, 0, "Buffer bos. E ile dosya acin.");
+        // check if the text buffer is empty
+        mvprintw(0, 0, "Buffer is empty. Please press E to open file.");
         return;
     }
 
-    // Bağlı listeyi sonuna kadar takip et (-1 listenin bittiğini gösterir)
     while (current != -1) {
-        // textbuffer[current].statement içeriğini ekrandaki screen_line satırına bas
+        // Loop through the buffer following the links until the end
         mvprintw(screen_line, 0, "%s", textbuffer[current].statement);
-        
         screen_line++;
-        current = textbuffer[current].next; // Bir sonraki düğümün indeksine zıpla
+        current = textbuffer[current].next; 
     }
 }
