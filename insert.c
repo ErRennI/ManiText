@@ -1,44 +1,13 @@
-#include "functions.h"
-#include <stdio.h>
-#include <ncurses.h>
-
-void edit(char* filename){
-    FILE *fptr = fopen(filename, "r");
-
-
-}
-
-void save();
-
-//Fonksiyonlarınızı burdan sonrasına ekleyin insert delete gibi
-
-// 20 Mayıs 2026
-//********************
-void print() {
-    int current = head; 
-    int screen_line = 0; 
-
-    if (current == -1) {
-        // check if the text buffer is empty
-        mvprintw(0, 0, "Buffer is empty. Please press E to open file.");
-        return;
-    }
-
-    while (current != -1) {
-        // Loop through the buffer following the links until the end
-        mvprintw(screen_line, 0, "%s", textbuffer[current].statement);
-        screen_line++;
-        current = textbuffer[current].next; 
-    }
-}
-
-// 20 Mayıs 2026
-//********************
+//düzenleme yapılacaktır
 //garbageCollection()
 //new_node_index
 //free_index
 //next_node_index
 //noecho araştır
+
+
+
+
 void insert(int index) {
     if (free_index >= 100 || free_index == -1) {
         //otomatik GarbageCollection
@@ -72,4 +41,3 @@ void insert(int index) {
     
     free_index++; //increase
 }
-
