@@ -5,7 +5,6 @@ void edit(char *filename);
 void insert(int index);
 void delete_line(int index);
 void replace(int index);
-void print_buffer();
 void save();
 int cursorLine();
 int cursorChar();
