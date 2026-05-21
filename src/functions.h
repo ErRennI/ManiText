@@ -6,6 +6,7 @@ void insert(int index);
 void delete_line(int index);
 void replace(int index);
 void save();
+void print();
 int cursorLine();
 int cursorChar();
 int garbageCollection();

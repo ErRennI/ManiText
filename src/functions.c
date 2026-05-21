@@ -1,14 +1,7 @@
 #include "functions.h"
+#include "datastruct.h"
 #include <stdio.h>
 #include <ncurses.h>
-
-void edit(char* filename){
-    FILE *fptr = fopen(filename, "r");
-
-
-}
-
-void save();
 
 //Fonksiyonlarınızı burdan sonrasına ekleyin insert delete gibi
 
@@ -154,4 +147,32 @@ void edit(char *filename) {
     textbuffer[tail].next = -1;
     free_idx = current_idx;
   }
+}
+
+//21 Mayıs 2026 Samet
+void save() {
+    char filename[50];
+    //kaydedilecek dosya adı 
+    printw("\nEnter filename to save");
+    refresh();
+    scanw("%49s", filename);
+
+    FILE* fptr = fopen(filename, "w"); //write mode, varsa dosyayı baştan yeniden oluşturur yoksa yeni dosya oluşturur
+    if (fptr == NULL) {
+        printw("Could not open file");
+        refresh();
+        return;
+    }
+
+    int current = head;
+
+    while (current != -1) {
+        fprintf(fptr, "%s\n", textbuffer[current].statement); //dosyanın içine geçiren kısım
+
+        current = textbuffer[current].next;
+    }
+
+    fclose(fptr);
+    printw("File saved to %s.", filename);
+    refresh();
 }
