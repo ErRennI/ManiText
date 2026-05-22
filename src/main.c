@@ -91,9 +91,6 @@ int main() {
           delete_line(current_line_d);
           op_counter++;
           
-          if (row > 0) {
-            row--;
-          }
         }
       }
       break;

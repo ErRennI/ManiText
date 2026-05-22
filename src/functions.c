@@ -93,7 +93,7 @@ void insert(int index) {
         int next_node_index = textbuffer[index].next;
         
         textbuffer[new_node_index].prev = index;
-        textbuffer[new_node_index].next = new_node_index;
+        textbuffer[new_node_index].next = next_node_index;
         textbuffer[index].next = new_node_index;
 
         if(next_node_index != -1){
@@ -195,14 +195,14 @@ void edit(char *filename) {
 void save() {
     char filename[50];
     //kaydedilecek dosya adı 
-    printw("\nEnter filename to save");
-    refresh();
+    mvprintw(LINES - 1, 0,"\nEnter filename to save");
+    echo();
     scanw("%49s", filename);
+    noecho();
 
     FILE* fptr = fopen(filename, "w"); //write mode, varsa dosyayı baştan yeniden oluşturur yoksa yeni dosya oluşturur
     if (fptr == NULL) {
-        printw("Could not open file");
-        refresh();
+        mvprintw(LINES - 1, 0, "Error: Could not open file!                 ");
         return;
     }
 
@@ -215,10 +215,8 @@ void save() {
     }
 
     fclose(fptr);
-    printw("File saved to %s.", filename);
-    refresh();
+    mvprintw(LINES - 1, 0, "File saved to %s.                           ", filename);
 }
-
 //22 Mayıs Samet
 int garbageCollection() {
 
