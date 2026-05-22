@@ -190,3 +190,39 @@ void save() {
     printw("File saved to %s.", filename);
     refresh();
 }
+
+//22 Mayıs Samet
+int garbageCollection() {
+
+    if (head == -1) {
+        free_idx = 0;
+        return 0;
+    }
+
+    struct node temp_buffer[100]; //temizler konuyo
+    int current = head;
+    int new_idx = 0;
+
+    while (current != -1) {
+        strcpy(temp_buffer[new_idx].statement, textbuffer[current].statement);//erişebildiği nextleri kopyalıyor, erişemedikleri kalıyor.
+
+        temp_buffer[new_idx].prev = new_idx - 1; // yeni linkler
+        temp_buffer[new_idx].next = new_idx + 1;
+
+        current = textbuffer[current].next;
+        new_idx++;
+
+    }
+
+    temp_buffer[new_idx - 1].next = -1;//Son elemandan sonrasını kapatır
+
+    for (int i = 0; i < new_idx; i++) { //temp temiz olan, temiz olanı orijinale koyuyor, collection tamamlanıyor.
+        textbuffer[i] = temp_buffer[i];
+    }
+
+    head = 0;
+    tail = new_idx - 1;
+    free_idx = new_idx;
+
+    return 1;
+}
