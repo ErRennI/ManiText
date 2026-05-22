@@ -62,34 +62,50 @@ void insert(int index) {
     if (free_idx >= LINE_ARRAY_SIZE || free_idx == -1) {
         //otomatik GarbageCollection
         garbageCollection();
-        if (free_idx == -1) return;
+        if (free_idx == -1 || free_idx >= LINE_ARRAY_SIZE) return;
+
+        index = cursorLine();
     }
 
     int new_node_index = free_idx; // yeni veriyi koyacağımız indeks
 
     echo(); 
     mvprintw(LINES - 1, 0, "New line: ");
+    clrtoeol();
     getnstr(textbuffer[new_node_index].statement, CHAR_ARRAY_SIZE - 1); // max 39 char
     noecho(); // tekrar gizli moda geç 
 
-   
-    
-    int next_node_index = textbuffer[index].next;
-    textbuffer[new_node_index].prev = index;           
-    textbuffer[new_node_index].next = next_node_index;  
-     // Örnek: A -> B arasına YENI ekliyoruz (A = index, YENI = new_node_index)
+    if(head == -1){
+        head = new_node_index;
+        tail = new_node_index;
+        textbuffer[new_node_index].next = -1;
+        textbuffer[new_node_index].prev = -1;
+    }
 
-    
-    textbuffer[index].next = new_node_index;           
+    else if(index == -1){
+        textbuffer[new_node_index].prev = -1;
+        textbuffer[new_node_index].next = head;
+        textbuffer[head].prev = new_node_index;
+        head = new_node_index;
+    }
 
-    // Eğer ekleme listenin en sonuna yapılmıyorsa, B'nin arkasını yeni elemana bağla
-    if (next_node_index != -1) {
-        textbuffer[next_node_index].prev = new_node_index; 
-    } else {
-        tail = new_node_index;    // if it is end then it is tail now
+    else{
+        int next_node_index = textbuffer[index].next;
+        
+        textbuffer[new_node_index].prev = index;
+        textbuffer[new_node_index].next = new_node_index;
+        textbuffer[index].next = new_node_index;
+
+        if(next_node_index != -1){
+            textbuffer[next_node_index].prev = new_node_index;
+        }
+        else{
+            tail = new_node_index;
+        }
     }
     
-    free_idx++; //increase
+    free_idx++;
+    mvprintw(LINES - 1, 0, "                                             ");
 }
 
 int cursorLine() {
@@ -215,18 +231,31 @@ int garbageCollection() {
     int current = head;
     int new_idx = 0;
 
-    while (current != -1) {
+
+    int index_map[LINE_ARRAY_SIZE];
+    for(int i = 0; i < LINE_ARRAY_SIZE; i++){
+        index_map[i] = -1;
+    }
+
+    while (current != -1 && new_idx < LINE_ARRAY_SIZE) {
         strcpy(temp_buffer[new_idx].statement, textbuffer[current].statement);//erişebildiği nextleri kopyalıyor, erişemedikleri kalıyor.
 
-        temp_buffer[new_idx].prev = new_idx - 1; // yeni linkler
-        temp_buffer[new_idx].next = new_idx + 1;
+        index_map[current] = new_idx;
 
         current = textbuffer[current].next;
         new_idx++;
 
     }
 
-    temp_buffer[new_idx - 1].next = -1;//Son elemandan sonrasını kapatır
+    for(int i = 0; i < new_idx; i++){
+        temp_buffer[i].prev = i - 1;
+        temp_buffer[i].next = i + 1;
+    }
+
+    //Son elemandan sonrasını kapatır
+    if (new_idx > 0) {
+        temp_buffer[new_idx - 1].next = -1;
+    }
 
     for (int i = 0; i < new_idx; i++) { //temp temiz olan, temiz olanı orijinale koyuyor, collection tamamlanıyor.
         textbuffer[i] = temp_buffer[i];

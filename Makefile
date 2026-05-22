@@ -16,8 +16,11 @@ $(TARGET): $(SRCS)
 	@mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) -o $(TARGET) $(SRCS) $(LIBS)
 
+run: all
+	./$(TARGET)
+	
 clean:
-	rm -rf $(OBJ_DIR)
+	@rm -rf $(OBJ_DIR)
 
 .PHONY: all clean
 

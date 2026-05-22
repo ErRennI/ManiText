@@ -1,5 +1,6 @@
 #include "functions.h"
 #include "datastruct.h"
+#include <stdlib.h>
 
 struct node textbuffer[LINE_ARRAY_SIZE];
 int head = -1;
@@ -9,7 +10,7 @@ int free_idx = 0;
 int main() {
   int op_counter = 0;
   int ch;
-
+  
   initscr();
   raw();
   keypad(stdscr, TRUE);
@@ -28,36 +29,38 @@ int main() {
   move(row, col);
 
   while ((ch = getch()) != 'Q' && ch != 'q') {
-    int current_line = cursorLine();
-    int current_char = cursorChar();
 
     switch (ch) {
     case KEY_UP:
       if (row > 0) {
         row--;
-        move(row, col);
       }
       break;
 
-    case KEY_DOWN:
+    case KEY_DOWN: {
+      int curr = head;
+      int line_count = 0;
+
+      while (curr != -1) {
+        line_count++;
+        curr = textbuffer[curr].next;
+      }
+
       // Eğer liste boşsa aşağı inmeyi engelle, çökme riskini azaltır
-      if (head != -1 && row < 29 && row < free_idx - 1) {
+      if (line_count > 0 && row < line_count - 1) {
         row++;
-        move(row, col);
       }
       break;
-
+    }
     case KEY_LEFT:
       if (col > 0) {
         col--;
-        move(row, col);
       }
       break;
 
     case KEY_RIGHT:
       if (col < 39) {
         col++;
-        move(row, col);
       }
       break;
 
@@ -68,26 +71,39 @@ int main() {
         op_counter = 0;
       }
 
+      move(row, col);
+      int current_line_i = cursorLine();
+
       // IDE Uyarısı 5 Çözümü: Eğer liste boşsa Miray'ın fonksiyonuna güvenli
       // bir işaret (-1) yolluyoruz Miray'ın insert() içinde 'if (index == -1)'
       // kontrolü yapması şart!
-      insert(current_line);
+      insert(current_line_i);
       op_counter++;
       break;
 
     case 'D':
     case 'd':
-      if (head != -1 &&
-          current_line != -1) { // Boş listeden eleman silinmesini engelle
-        delete_line(current_line);
-        op_counter++;
+      if (head != -1) { 
+        move(row, col);
+        int current_line_d = cursorLine();
+
+        if (current_line_d != -1) { // Boş listeden eleman silinmesini engelle
+          delete_line(current_line_d);
+          op_counter++;
+          
+          if (row > 0) {
+            row--;
+          }
+        }
       }
       break;
 
     case 'R':
     case 'r':
       if (head != -1) {
-        replace(current_char);
+        move(row, col);
+        int current_char_r = cursorChar();
+        replace(current_char_r);
       }
       break;
 
@@ -103,9 +119,20 @@ int main() {
       break;
     }
 
-    if (op_counter >= 10) {
+    if (op_counter >= 10 || free_idx >= LINE_ARRAY_SIZE) {
       garbageCollection();
       op_counter = 0;
+      
+      int line_count = 0;
+      int curr = head;
+      while (curr != -1) {
+        line_count++;
+        curr = textbuffer[curr].next;
+      }
+
+      if (row >= line_count) {
+        row = (line_count > 0) ? line_count - 1 : 0;
+      }
     }
 
     clear();
