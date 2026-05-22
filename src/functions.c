@@ -8,15 +8,27 @@ int cursorChar(){
 
     getyx(stdscr, y, x);
 
-    if(x > 39){
-        return 39;
+    if(x > CHAR_ARRAY_SIZE-1){
+        return CHAR_ARRAY_SIZE-1;
     }
 
     return x;
 }
 
 void replace(int index){
-    
+    int line_index = cursorLine();
+    if((line_index == -1) || (index < 0) || (index >= CHAR_ARRAY_SIZE)){
+        return;
+    }
+
+    mvprintw(LINES - 1, 0, "Replace character, new character: ");
+    echo();
+    int new_char = getch();
+    noecho();
+
+    textbuffer[line_index].statement[index] = (char)new_char;
+
+    mvprintw(LINES-1, 0, "                                  ");
 }
 
 // 20 Mayıs 2026
@@ -47,7 +59,7 @@ void print() {
 //next_node_index
 //noecho araştır
 void insert(int index) {
-    if (free_idx >= 100 || free_idx == -1) {
+    if (free_idx >= LINE_ARRAY_SIZE || free_idx == -1) {
         //otomatik GarbageCollection
         garbageCollection();
         if (free_idx == -1) return;
@@ -57,7 +69,7 @@ void insert(int index) {
 
     echo(); 
     mvprintw(LINES - 1, 0, "New line: ");
-    getnstr(textbuffer[new_node_index].statement, 39); // max 39 char
+    getnstr(textbuffer[new_node_index].statement, CHAR_ARRAY_SIZE - 1); // max 39 char
     noecho(); // tekrar gizli moda geç 
 
    
@@ -135,12 +147,12 @@ void edit(char *filename) {
 
   head = 0;
 
-  while (fgets(line, sizeof(line), file) && current_idx < 100) {
+  while (fgets(line, sizeof(line), file) && current_idx < (LINE_ARRAY_SIZE - 1) ) {
     line[strcspn(line, "\n")] = 0;
 
     // Hocanın kuralı: En fazla 40 karakter (39 + null)
-    strncpy(textbuffer[current_idx].statement, line, 39);
-    textbuffer[current_idx].statement[39] = '\0';
+    strncpy(textbuffer[current_idx].statement, line, CHAR_ARRAY_SIZE - 1);
+    textbuffer[current_idx].statement[CHAR_ARRAY_SIZE - 1] = '\0';
 
     textbuffer[current_idx].prev = current_idx - 1;
     textbuffer[current_idx].next = current_idx + 1;
@@ -199,7 +211,7 @@ int garbageCollection() {
         return 0;
     }
 
-    struct node temp_buffer[100]; //temizler konuyo
+    struct node temp_buffer[LINE_ARRAY_SIZE]; //temizler konuyo
     int current = head;
     int new_idx = 0;
 

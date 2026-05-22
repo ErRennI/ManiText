@@ -1,0 +1,23 @@
+CC = gcc
+CFLAGS = -Wall -Wextra -g
+
+LIBS = -lncurses
+
+SRC_DIR = src
+OBJ_DIR = build
+
+TARGET = $(OBJ_DIR)/ManiText
+
+SRCS = $(SRC_DIR)/main.c $(SRC_DIR)/functions.c
+
+all: $(TARGET)
+
+$(TARGET): $(SRCS)
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -o $(TARGET) $(SRCS) $(LIBS)
+
+clean:
+	rm -rf $(OBJ_DIR)
+
+.PHONY: all clean
+

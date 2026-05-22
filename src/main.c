@@ -1,7 +1,7 @@
 #include "functions.h"
 #include "datastruct.h"
 
-struct node textbuffer[100];
+struct node textbuffer[LINE_ARRAY_SIZE];
 int head = -1;
 int tail = -1;
 int free_idx = 0;
@@ -15,7 +15,7 @@ int main() {
   keypad(stdscr, TRUE);
   noecho();
 
-  printw("Düzenlemek istediğiniz dosya adini yazın: ");
+  printw("Enter the name of the file you want to edit: ");
   char filename[40];
   echo();
   getstr(filename);
@@ -111,10 +111,9 @@ int main() {
     clear();
 
     if (head == -1) {
-      printw("[Bos Belge - Satir eklemek için 'I' basiniz]");
+      printw("[Empty file - Press 'I' to add line]");
     } else {
-      // print(); // Miray print'i verince burayı açacaksın!
-      printw("[Veriler Yüklendi - Miray'in print fonksiyonu bekleniyor]");
+      print();
     }
 
     move(row, col);
