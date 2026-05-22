@@ -1,4 +1,5 @@
-#include "editor.h"
+#include "functions.h"
+#include "datastruct.h"
 
 struct node textbuffer[100];
 int head = -1;

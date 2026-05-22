@@ -3,7 +3,21 @@
 #include <stdio.h>
 #include <ncurses.h>
 
-//Fonksiyonlarınızı burdan sonrasına ekleyin insert delete gibi
+int cursorChar(){
+    int x,y;
+
+    getyx(stdscr, y, x);
+
+    if(x > 39){
+        return 39;
+    }
+
+    return x;
+}
+
+void replace(int index){
+    
+}
 
 // 20 Mayıs 2026
 //********************
@@ -33,13 +47,13 @@ void print() {
 //next_node_index
 //noecho araştır
 void insert(int index) {
-    if (free_index >= 100 || free_index == -1) {
+    if (free_idx >= 100 || free_idx == -1) {
         //otomatik GarbageCollection
         garbageCollection();
-        if (free_index == -1) return;
+        if (free_idx == -1) return;
     }
 
-    int new_node_index = free_index; // yeni veriyi koyacağımız indeks
+    int new_node_index = free_idx; // yeni veriyi koyacağımız indeks
 
     echo(); 
     mvprintw(LINES - 1, 0, "New line: ");
@@ -63,7 +77,7 @@ void insert(int index) {
         tail = new_node_index;    // if it is end then it is tail now
     }
     
-    free_index++; //increase
+    free_idx++; //increase
 }
 
 int cursorLine() {
