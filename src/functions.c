@@ -229,16 +229,8 @@ int garbageCollection() {
     int current = head;
     int new_idx = 0;
 
-
-    int index_map[LINE_ARRAY_SIZE];
-    for(int i = 0; i < LINE_ARRAY_SIZE; i++){
-        index_map[i] = -1;
-    }
-
     while (current != -1 && new_idx < LINE_ARRAY_SIZE) {
         strcpy(temp_buffer[new_idx].statement, textbuffer[current].statement);//erişebildiği nextleri kopyalıyor, erişemedikleri kalıyor.
-
-        index_map[current] = new_idx;
 
         current = textbuffer[current].next;
         new_idx++;
