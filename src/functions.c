@@ -1,151 +1,155 @@
 #include "functions.h"
 #include "datastruct.h"
-#include <stdio.h>
 #include <ncurses.h>
+#include <stdio.h>
 
-int cursorChar(){
-    int x,y;
+int cursorChar() {
+  int x, y;
 
-    getyx(stdscr, y, x);
+  getyx(stdscr, y, x);
+  (void)y;
 
-    if(x > CHAR_ARRAY_SIZE-1){
-        return CHAR_ARRAY_SIZE-1;
-    }
+  if (x > CHAR_ARRAY_SIZE - 1) {
+    return CHAR_ARRAY_SIZE - 1;
+  }
 
-    return x;
+  return x;
 }
 
-void replace(int index){
-    int line_index = cursorLine();
-    if((line_index == -1) || (index < 0) || (index >= CHAR_ARRAY_SIZE)){
-        return;
-    }
+void replace(int index) {
+  int line_index = cursorLine();
+  if ((line_index == -1) || (index < 0) || (index >= CHAR_ARRAY_SIZE)) {
+    return;
+  }
 
-    mvprintw(LINES - 1, 0, "Replace character, new character: ");
-    echo();
-    int new_char = getch();
-    noecho();
+  mvprintw(LINES - 1, 0, "Replace character, new character: ");
+  echo();
+  int new_char = getch();
+  noecho();
 
-    textbuffer[line_index].statement[index] = (char)new_char;
+  textbuffer[line_index].statement[index] = (char)new_char;
 
-    mvprintw(LINES-1, 0, "                                  ");
+  mvprintw(LINES - 1, 0, "                                  ");
 }
 
 // 20 Mayıs 2026
 //********************
 void print() {
-    int current = head; 
-    int screen_line = 0; 
+  int current = head;
+  int screen_line = 0;
 
-    if (current == -1) {
-        // check if the text buffer is empty
-        mvprintw(0, 0, "Buffer is empty. Please press E to open file.");
-        return;
-    }
+  if (current == -1) {
+    // check if the text buffer is empty
+    mvprintw(0, 0, "Buffer is empty. Please press E to open file.");
+    return;
+  }
 
-    while (current != -1) {
-        // Loop through the buffer following the links until the end
-        mvprintw(screen_line, 0, "%s", textbuffer[current].statement);
-        screen_line++;
-        current = textbuffer[current].next; 
-    }
+  while (current != -1) {
+    // Loop through the buffer following the links until the end
+    mvprintw(screen_line, 0, "%s", textbuffer[current].statement);
+    screen_line++;
+    current = textbuffer[current].next;
+  }
 }
 
 // 20 Mayıs 2026
 //********************
-//garbageCollection()
-//new_node_index
-//free_index
-//next_node_index
-//noecho araştır
+// garbageCollection()
+// new_node_index
+// free_index
+// next_node_index
+// noecho araştır
 void insert(int index) {
-    if (free_idx >= LINE_ARRAY_SIZE || free_idx == -1) {
-        //otomatik GarbageCollection
-        garbageCollection();
-        if (free_idx == -1 || free_idx >= LINE_ARRAY_SIZE) return;
+  if (free_idx >= LINE_ARRAY_SIZE || free_idx == -1) {
+    // otomatik GarbageCollection
+    garbageCollection();
+    if (free_idx == -1 || free_idx >= LINE_ARRAY_SIZE)
+      return;
 
-        index = cursorLine();
+    index = cursorLine();
+  }
+
+  int new_node_index = free_idx; // yeni veriyi koyacağımız indeks
+
+  echo();
+  mvprintw(LINES - 1, 0, "New line: ");
+  clrtoeol();
+  getnstr(textbuffer[new_node_index].statement,
+          CHAR_ARRAY_SIZE - 1); // max 39 char
+  noecho();                     // tekrar gizli moda geç
+
+  if (head == -1) {
+    head = new_node_index;
+    tail = new_node_index;
+    textbuffer[new_node_index].next = -1;
+    textbuffer[new_node_index].prev = -1;
+  }
+
+  else if (index == -1) {
+    textbuffer[new_node_index].prev = -1;
+    textbuffer[new_node_index].next = head;
+    textbuffer[head].prev = new_node_index;
+    head = new_node_index;
+  }
+
+  else {
+    int next_node_index = textbuffer[index].next;
+
+    textbuffer[new_node_index].prev = index;
+    textbuffer[new_node_index].next = next_node_index;
+    textbuffer[index].next = new_node_index;
+
+    if (next_node_index != -1) {
+      textbuffer[next_node_index].prev = new_node_index;
+    } else {
+      tail = new_node_index;
     }
+  }
 
-    int new_node_index = free_idx; // yeni veriyi koyacağımız indeks
-
-    echo(); 
-    mvprintw(LINES - 1, 0, "New line: ");
-    clrtoeol();
-    getnstr(textbuffer[new_node_index].statement, CHAR_ARRAY_SIZE - 1); // max 39 char
-    noecho(); // tekrar gizli moda geç 
-
-    if(head == -1){
-        head = new_node_index;
-        tail = new_node_index;
-        textbuffer[new_node_index].next = -1;
-        textbuffer[new_node_index].prev = -1;
-    }
-
-    else if(index == -1){
-        textbuffer[new_node_index].prev = -1;
-        textbuffer[new_node_index].next = head;
-        textbuffer[head].prev = new_node_index;
-        head = new_node_index;
-    }
-
-    else{
-        int next_node_index = textbuffer[index].next;
-        
-        textbuffer[new_node_index].prev = index;
-        textbuffer[new_node_index].next = next_node_index;
-        textbuffer[index].next = new_node_index;
-
-        if(next_node_index != -1){
-            textbuffer[next_node_index].prev = new_node_index;
-        }
-        else{
-            tail = new_node_index;
-        }
-    }
-    
-    free_idx++;
-    mvprintw(LINES - 1, 0, "                                             ");
+  free_idx++;
+  mvprintw(LINES - 1, 0, "                                             ");
+  print();
+  refresh();
 }
 
-int cursorLine() {
-    int y, x;
-    getyx(stdscr, y, x); // Ncurses imleç koordinatlarını aldık
+int cursorLine(){
+  int y, x;
+  getyx(stdscr, y, x); //ekrandaki cursor koordinatlarını alıyoruz
 
-    int curr = head; 
-    int count = 0;
+  int cur=head; 
+  int count=0; //kaçıncı satırda olduğumuzu saymak için 
 
-    // ekrandaki satır sayısına (y) ulaşana kadar listeyi takip et
-    while (curr != -1 && count < y) {
-        curr = textbuffer[curr].next;
-        count++;
-    }
+  //y'ye(imlecin durduğu satır) gelene kadar ilerle
+  while(cur!=-1&&count<y){
+    cur=textbuffer[cur].next;
+    count++;
+  }
 
-    return curr; // bulduğu dizi indexi
+  return cur; //satırın textbuffer arrayindeki indeksi
 }
 
-void delete_line(int index) {
-    if (index == -1) return; 
+void delete(int index){
+  if(index==-1)
+    return;
 
-    int p_prev = textbuffer[index].prev;
-    int p_next = textbuffer[index].next;
+  int p_prev=textbuffer[index].prev;
+  int p_next=textbuffer[index].next;
 
-    // silinen eleman head ise
-    if (index == head) { 
-        head = p_next; // yeni head sonraki eleman
-    } else {
-        // başta değilse, arkasındaki elemanın next bağını bir ileri atlatırız
-        textbuffer[p_prev].next = p_next;
-    }
+ 
+  if(index==head){
+    head=p_next; 
+  }else{
+    textbuffer[p_prev].next=p_next;
+  }
 
-    // listenin sonundaysa tail
-    if (index == tail) { 
-        tail = p_prev; // yeni tail öncekli eleman olur
-    } else {
-        // son değilse previ geriye bağlarız
-        textbuffer[p_next].prev = p_prev;
-    }
-    
+  if(index==tail){
+    tail=p_prev; 
+  }else{
+    textbuffer[p_next].prev=p_prev;
+  }
+  
+  print();
+  refresh();
 }
 
 void edit(char *filename) {
@@ -163,7 +167,8 @@ void edit(char *filename) {
 
   head = 0;
 
-  while (fgets(line, sizeof(line), file) && current_idx < (LINE_ARRAY_SIZE - 1) ) {
+  while (fgets(line, sizeof(line), file) &&
+         current_idx < (LINE_ARRAY_SIZE - 1)) {
     line[strcspn(line, "\n")] = 0;
 
     // Hocanın kuralı: En fazla 40 karakter (39 + null)
@@ -191,69 +196,76 @@ void edit(char *filename) {
   }
 }
 
-//21 Mayıs 2026 Samet
+// 21 Mayıs 2026 Samet
 void save() {
-    char filename[50];
-    //kaydedilecek dosya adı 
-    mvprintw(LINES - 1, 0,"\nEnter filename to save");
-    echo();
-    scanw("%49s", filename);
-    noecho();
+  char filename[50];
+  // kaydedilecek dosya adı
+  mvprintw(LINES - 1, 0, "Enter filename to save: ");
+  clrtoeol();
+  echo();
+  scanw("%49s", filename);
+  noecho();
 
-    FILE* fptr = fopen(filename, "w"); //write mode, varsa dosyayı baştan yeniden oluşturur yoksa yeni dosya oluşturur
-    if (fptr == NULL) {
-        mvprintw(LINES - 1, 0, "Error: Could not open file!                 ");
-        return;
-    }
+  FILE *fptr = fopen(filename, "w"); // write mode, varsa dosyayı baştan yeniden
+                                     // oluşturur yoksa yeni dosya oluşturur
+  if (fptr == NULL) {
+    snprintf(status_message, sizeof(status_message),
+             "Error: Could not open file!");
+    return;
+  }
 
-    int current = head;
+  int current = head;
 
-    while (current != -1) {
-        fprintf(fptr, "%s\n", textbuffer[current].statement); //dosyanın içine geçiren kısım
+  while (current != -1) {
+    fprintf(fptr, "%s\n",
+            textbuffer[current].statement); // dosyanın içine geçiren kısım
 
-        current = textbuffer[current].next;
-    }
+    current = textbuffer[current].next;
+  }
 
-    fclose(fptr);
-    mvprintw(LINES - 1, 0, "File saved to %s.                           ", filename);
+  fclose(fptr);
+  snprintf(status_message, sizeof(status_message), "File saved to %s.",
+           filename);
 }
-//22 Mayıs Samet
+// 22 Mayıs Samet
 int garbageCollection() {
 
-    if (head == -1) {
-        free_idx = 0;
-        return 0;
-    }
+  if (head == -1) {
+    free_idx = 0;
+    return 0;
+  }
 
-    struct node temp_buffer[LINE_ARRAY_SIZE]; //temizler konuyo
-    int current = head;
-    int new_idx = 0;
+  struct node temp_buffer[LINE_ARRAY_SIZE]; // temizler konuyo
+  int current = head;
+  int new_idx = 0;
 
-    while (current != -1 && new_idx < LINE_ARRAY_SIZE) {
-        strcpy(temp_buffer[new_idx].statement, textbuffer[current].statement);//erişebildiği nextleri kopyalıyor, erişemedikleri kalıyor.
+  while (current != -1 && new_idx < LINE_ARRAY_SIZE) {
+    strcpy(temp_buffer[new_idx].statement,
+           textbuffer[current].statement); // erişebildiği nextleri kopyalıyor,
+                                           // erişemedikleri kalıyor.
 
-        current = textbuffer[current].next;
-        new_idx++;
+    current = textbuffer[current].next;
+    new_idx++;
+  }
 
-    }
+  for (int i = 0; i < new_idx; i++) {
+    temp_buffer[i].prev = i - 1;
+    temp_buffer[i].next = i + 1;
+  }
 
-    for(int i = 0; i < new_idx; i++){
-        temp_buffer[i].prev = i - 1;
-        temp_buffer[i].next = i + 1;
-    }
+  // Son elemandan sonrasını kapatır
+  if (new_idx > 0) {
+    temp_buffer[new_idx - 1].next = -1;
+  }
 
-    //Son elemandan sonrasını kapatır
-    if (new_idx > 0) {
-        temp_buffer[new_idx - 1].next = -1;
-    }
+  for (int i = 0; i < new_idx; i++) { // temp temiz olan, temiz olanı orijinale
+                                      // koyuyor, collection tamamlanıyor.
+    textbuffer[i] = temp_buffer[i];
+  }
 
-    for (int i = 0; i < new_idx; i++) { //temp temiz olan, temiz olanı orijinale koyuyor, collection tamamlanıyor.
-        textbuffer[i] = temp_buffer[i];
-    }
+  head = 0;
+  tail = new_idx - 1;
+  free_idx = new_idx;
 
-    head = 0;
-    tail = new_idx - 1;
-    free_idx = new_idx;
-
-    return 1;
+  return 1;
 }

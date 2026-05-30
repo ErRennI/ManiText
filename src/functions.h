@@ -3,7 +3,7 @@
 //Function signatures
 void edit(char *filename);
 void insert(int index);
-void delete_line(int index);
+void delete(int index);
 void replace(int index);
 void save();
 void print();

@@ -19,5 +19,6 @@ extern struct node textbuffer[LINE_ARRAY_SIZE]; // En fazla 100 satır
 extern int head;
 extern int tail;
 extern int free_idx;
+extern char status_message[100];
 
 #endif
