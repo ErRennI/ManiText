@@ -22,14 +22,18 @@ void replace(int index) {
     return;
   }
 
+  move(LINES - 1, 0);
+  clrtoeol();
   mvprintw(LINES - 1, 0, "Replace character, new character: ");
+  
   echo();
   int new_char = getch();
   noecho();
 
   textbuffer[line_index].statement[index] = (char)new_char;
 
-  mvprintw(LINES - 1, 0, "                                  ");
+  move(LINES - 1, 0);
+  clrtoeol();
 }
 
 // 20 Mayıs 2026
@@ -69,14 +73,15 @@ void insert(int index) {
     index = cursorLine();
   }
 
-  int new_node_index = free_idx; // yeni veriyi koyacağımız indeks
+  int new_node_index = free_idx; 
 
-  echo();
-  mvprintw(LINES - 1, 0, "New line: ");
+  move(LINES - 1, 0);
   clrtoeol();
-  getnstr(textbuffer[new_node_index].statement,
-          CHAR_ARRAY_SIZE - 1); // max 39 char
-  noecho();                     // tekrar gizli moda geç
+  mvprintw(LINES - 1, 0, "New line: ");
+  
+  echo();
+  getnstr(textbuffer[new_node_index].statement, CHAR_ARRAY_SIZE - 1); 
+  noecho();                     
 
   if (head == -1) {
     head = new_node_index;
@@ -107,7 +112,10 @@ void insert(int index) {
   }
 
   free_idx++;
-  mvprintw(LINES - 1, 0, "                                             ");
+  
+  move(LINES - 1, 0);
+  clrtoeol();
+  
   print();
   refresh();
 }
@@ -200,8 +208,9 @@ void edit(char *filename) {
 void save() {
   char filename[50];
   // kaydedilecek dosya adı
-  mvprintw(LINES - 1, 0, "Enter filename to save: ");
+  move(LINES - 1, 0);
   clrtoeol();
+  mvprintw(LINES - 1, 0, "Enter filename to save: ");
   echo();
   scanw("%49s", filename);
   noecho();

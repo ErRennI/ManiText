@@ -77,15 +77,21 @@ int main() {
 
     case 'E':
     case 'e': {
+      move(LINES - 1, 0);
+      clrtoeol();
       mvprintw(LINES - 1, 0, "Enter filename to edit: ");
       char temp_filename[40];
       echo();
       getnstr(temp_filename, 39);
       noecho();
+      
       edit(temp_filename);
       row = 0;
       col = 0;
-      mvprintw(LINES - 1, 0, "                                             ");
+      
+      move(LINES - 1, 0);
+      clrtoeol();
+      status_message[0] = '\0';
       break;
     }
 
