@@ -96,7 +96,7 @@ int main() {
 
     case 10:
     case KEY_ENTER:
-      snprintf(status_message, sizeof(status_message), "Line selected. Press I to insert, D to delete, R to replace.");
+      snprintf(status_message, sizeof(status_message), "Line selected. Press I to insert, D to delete, R to replace, S to save, E to edit filename");
       break;
 
     case 'I':
