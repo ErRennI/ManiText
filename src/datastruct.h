@@ -10,12 +10,12 @@
 #define LINE_ARRAY_SIZE 100
 
 struct node {
-    char statement[CHAR_ARRAY_SIZE]; // En fazla 40 karakterlik satır 
-    int next;           // Bir sonraki satırın dizi indeksi 
-    int prev;           // Bir önceki satırın dizi indeksi 
+    char statement[CHAR_ARRAY_SIZE];
+    int next;
+    int prev;
 };
 
-extern struct node textbuffer[LINE_ARRAY_SIZE]; // En fazla 100 satır 
+extern struct node textbuffer[LINE_ARRAY_SIZE];
 extern int head;
 extern int tail;
 extern int free_idx;

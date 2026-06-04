@@ -25,7 +25,7 @@ void replace(int index) {
   move(LINES - 1, 0);
   clrtoeol();
   mvprintw(LINES - 1, 0, "Replace character, new character: ");
-  
+
   echo();
   int new_char = getch();
   noecho();
@@ -36,36 +36,24 @@ void replace(int index) {
   clrtoeol();
 }
 
-// 20 Mayıs 2026
-//********************
 void print() {
   int current = head;
   int screen_line = 0;
 
   if (current == -1) {
-    // check if the text buffer is empty
     mvprintw(0, 0, "Buffer is empty. Please press E to open file.");
     return;
   }
 
   while (current != -1) {
-    // Loop through the buffer following the links until the end
     mvprintw(screen_line, 0, "%s", textbuffer[current].statement);
     screen_line++;
     current = textbuffer[current].next;
   }
 }
 
-// 20 Mayıs 2026
-//********************
-// garbageCollection()
-// new_node_index
-// free_index
-// next_node_index
-// noecho araştır
 void insert(int index) {
   if (free_idx >= LINE_ARRAY_SIZE || free_idx == -1) {
-    // otomatik GarbageCollection
     garbageCollection();
     if (free_idx == -1 || free_idx >= LINE_ARRAY_SIZE)
       return;
@@ -73,15 +61,15 @@ void insert(int index) {
     index = cursorLine();
   }
 
-  int new_node_index = free_idx; 
+  int new_node_index = free_idx;
 
   move(LINES - 1, 0);
   clrtoeol();
   mvprintw(LINES - 1, 0, "New line: ");
-  
+
   echo();
-  getnstr(textbuffer[new_node_index].statement, CHAR_ARRAY_SIZE - 1); 
-  noecho();                     
+  getnstr(textbuffer[new_node_index].statement, CHAR_ARRAY_SIZE - 1);
+  noecho();
 
   if (head == -1) {
     head = new_node_index;
@@ -112,50 +100,48 @@ void insert(int index) {
   }
 
   free_idx++;
-  
+
   move(LINES - 1, 0);
   clrtoeol();
-  
+
   print();
   refresh();
 }
 
-int cursorLine(){
+int cursorLine() {
   int y, x;
-  getyx(stdscr, y, x); //ekrandaki cursor koordinatlarını alıyoruz
+  getyx(stdscr, y, x);
 
-  int cur=head; 
-  int count=0; //kaçıncı satırda olduğumuzu saymak için 
+  int cur = head;
+  int count = 0;
 
-  //y'ye(imlecin durduğu satır) gelene kadar ilerle
-  while(cur!=-1&&count<y){
-    cur=textbuffer[cur].next;
+  while (cur != -1 && count < y) {
+    cur = textbuffer[cur].next;
     count++;
   }
 
-  return cur; //satırın textbuffer arrayindeki indeksi
+  return cur;
 }
 
-void delete(int index){
-  if(index==-1)
+void delete_line(int index) {
+  if (index == -1)
     return;
 
-  int p_prev=textbuffer[index].prev;
-  int p_next=textbuffer[index].next;
+  int p_prev = textbuffer[index].prev;
+  int p_next = textbuffer[index].next;
 
- 
-  if(index==head){
-    head=p_next; 
-  }else{
-    textbuffer[p_prev].next=p_next;
+  if (index == head) {
+    head = p_next;
+  } else {
+    textbuffer[p_prev].next = p_next;
   }
 
-  if(index==tail){
-    tail=p_prev; 
-  }else{
-    textbuffer[p_next].prev=p_prev;
+  if (index == tail) {
+    tail = p_prev;
+  } else {
+    textbuffer[p_next].prev = p_prev;
   }
-  
+
   print();
   refresh();
 }
@@ -169,7 +155,6 @@ void edit(char *filename) {
     return;
   }
 
-  // IDE Uyarısı 6 Çözümü: Satır tamponunu büyük tutuyoruz ki bölünme olmasın
   char line[256];
   int current_idx = 0;
 
@@ -179,7 +164,6 @@ void edit(char *filename) {
          current_idx < (LINE_ARRAY_SIZE - 1)) {
     line[strcspn(line, "\n")] = 0;
 
-    // Hocanın kuralı: En fazla 40 karakter (39 + null)
     strncpy(textbuffer[current_idx].statement, line, CHAR_ARRAY_SIZE - 1);
     textbuffer[current_idx].statement[CHAR_ARRAY_SIZE - 1] = '\0';
 
@@ -192,7 +176,6 @@ void edit(char *filename) {
   fclose(file);
 
   if (current_idx == 0) {
-    // eğer dosya tamamen boş çıktıysa listeyi boşalt
     head = -1;
     tail = -1;
     free_idx = 0;
@@ -204,10 +187,8 @@ void edit(char *filename) {
   }
 }
 
-// 21 Mayıs 2026 Samet
 void save() {
   char filename[50];
-  // kaydedilecek dosya adı
   move(LINES - 1, 0);
   clrtoeol();
   mvprintw(LINES - 1, 0, "Enter filename to save: ");
@@ -215,8 +196,7 @@ void save() {
   scanw("%49s", filename);
   noecho();
 
-  FILE *fptr = fopen(filename, "w"); // write mode, varsa dosyayı baştan yeniden
-                                     // oluşturur yoksa yeni dosya oluşturur
+  FILE *fptr = fopen(filename, "w");
   if (fptr == NULL) {
     snprintf(status_message, sizeof(status_message),
              "Error: Could not open file!");
@@ -226,8 +206,7 @@ void save() {
   int current = head;
 
   while (current != -1) {
-    fprintf(fptr, "%s\n",
-            textbuffer[current].statement); // dosyanın içine geçiren kısım
+    fprintf(fptr, "%s\n", textbuffer[current].statement);
 
     current = textbuffer[current].next;
   }
@@ -236,7 +215,6 @@ void save() {
   snprintf(status_message, sizeof(status_message), "File saved to %s.",
            filename);
 }
-// 22 Mayıs Samet
 int garbageCollection() {
 
   if (head == -1) {
@@ -244,14 +222,12 @@ int garbageCollection() {
     return 0;
   }
 
-  struct node temp_buffer[LINE_ARRAY_SIZE]; // temizler konuyo
+  struct node temp_buffer[LINE_ARRAY_SIZE];
   int current = head;
   int new_idx = 0;
 
   while (current != -1 && new_idx < LINE_ARRAY_SIZE) {
-    strcpy(temp_buffer[new_idx].statement,
-           textbuffer[current].statement); // erişebildiği nextleri kopyalıyor,
-                                           // erişemedikleri kalıyor.
+    strcpy(temp_buffer[new_idx].statement, textbuffer[current].statement);
 
     current = textbuffer[current].next;
     new_idx++;
@@ -262,13 +238,11 @@ int garbageCollection() {
     temp_buffer[i].next = i + 1;
   }
 
-  // Son elemandan sonrasını kapatır
   if (new_idx > 0) {
     temp_buffer[new_idx - 1].next = -1;
   }
 
-  for (int i = 0; i < new_idx; i++) { // temp temiz olan, temiz olanı orijinale
-                                      // koyuyor, collection tamamlanıyor.
+  for (int i = 0; i < new_idx; i++) {
     textbuffer[i] = temp_buffer[i];
   }
 

@@ -1,5 +1,5 @@
-#include "functions.h"
 #include "datastruct.h"
+#include "functions.h"
 #include <stdlib.h>
 
 struct node textbuffer[LINE_ARRAY_SIZE];
@@ -11,7 +11,7 @@ char status_message[100] = "";
 int main() {
   int op_counter = 0;
   int ch;
-  
+
   initscr();
   raw();
   keypad(stdscr, TRUE);
@@ -25,7 +25,6 @@ int main() {
 
   edit(filename);
 
-  // İlk çizim: Döngüye girmeden önce ekranı temizleyip dosyayı ekrana basıyoruz
   clear();
   if (head == -1) {
     printw("[Empty file - Press 'I' to add line]");
@@ -39,7 +38,7 @@ int main() {
   refresh();
 
   while ((ch = getch()) != 'Q' && ch != 'q') {
-    status_message[0] = '\0'; // Her tuş vuruşunda durum mesajını temizle
+    status_message[0] = '\0';
 
     switch (ch) {
     case KEY_UP:
@@ -57,7 +56,6 @@ int main() {
         curr = textbuffer[curr].next;
       }
 
-      // Eğer liste boşsa aşağı inmeyi engelle, çökme riskini azaltır
       if (line_count > 0 && row < line_count - 1) {
         row++;
       }
@@ -84,11 +82,11 @@ int main() {
       echo();
       getnstr(temp_filename, 39);
       noecho();
-      
+
       edit(temp_filename);
       row = 0;
       col = 0;
-      
+
       move(LINES - 1, 0);
       clrtoeol();
       status_message[0] = '\0';
@@ -97,12 +95,13 @@ int main() {
 
     case 'P':
     case 'p':
-      // Redraw is handled automatically at the end of the loop
       break;
 
     case 10:
     case KEY_ENTER:
-      snprintf(status_message, sizeof(status_message), "Line selected. Press I to insert, D to delete, R to replace, S to save, E to edit filename");
+      snprintf(status_message, sizeof(status_message),
+               "Line selected. Press I to insert, D to delete, R to replace, S "
+               "to save, E to edit filename, Q to quit");
       break;
 
     case 'I':
@@ -115,24 +114,20 @@ int main() {
       move(row, col);
       int current_line_i = cursorLine();
 
-      // IDE Uyarısı 5 Çözümü: Eğer liste boşsa Miray'ın fonksiyonuna güvenli
-      // bir işaret (-1) yolluyoruz Miray'ın insert() içinde 'if (index == -1)'
-      // kontrolü yapması şart!
       insert(current_line_i);
       op_counter++;
       break;
 
     case 'D':
     case 'd':
-      if (head != -1) { 
+      if (head != -1) {
         move(row, col);
         int current_line_d = cursorLine();
 
-        if (current_line_d != -1) { // Boş listeden eleman silinmesini engelle
-          delete(current_line_d);
+        if (current_line_d != -1) {
+          delete_line (current_line_d);
           op_counter++;
-          
-          // Silme işleminden sonra row sınırını korumak için satır sayısını kontrol ediyoruz
+
           int line_count = 0;
           int curr = head;
           while (curr != -1) {
@@ -170,7 +165,7 @@ int main() {
     if (op_counter >= 10 || free_idx >= LINE_ARRAY_SIZE) {
       garbageCollection();
       op_counter = 0;
-      
+
       int line_count = 0;
       int curr = head;
       while (curr != -1) {
@@ -191,7 +186,6 @@ int main() {
       print();
     }
 
-    // Durum mesajı varsa en alt satırda yazdırıyoruz
     if (status_message[0] != '\0') {
       mvprintw(LINES - 1, 0, "%s", status_message);
     }
